@@ -26,8 +26,9 @@ module.exports = function(RED) {
     this.current_status = {};
     this.points_result = {};
     
-    this.h_plus = Math.abs(parseFloat(config.hysteresisplus)) || 0;
+    this.h_plus = Math.abs(parseFloat(config.hysteresisplus)) || 0;
     this.h_minus = Math.abs(parseFloat(config.hysteresisminus)) || 0;
+    this.isRampUsed = (parseInt(config.behavior) || 1 ? true : false);
     
     // experimental
     //this.profile = globalContext.get(node_name);
@@ -61,8 +62,7 @@ module.exports = function(RED) {
       if (typeof msg.payload === "undefined") {
         this.warn("msg.payload undefined"); 
       } else { 
-        switch (msg.topic) {
-          case "setCurrent":
+        switch (msg.topic.toLowerCase()) {
           case "setcurrent":
           case "":
           case undefined:
@@ -86,7 +86,6 @@ module.exports = function(RED) {
             }
             break;
             
-          case "setTarget":
           case "settarget":
             result = setTarget(msg.payload);
             
@@ -98,7 +97,6 @@ module.exports = function(RED) {
             }
             break;
           
-          case "setProfile":
           case "setprofile":
             //this.warn(JSON.stringify(msg.payload));
             result = setProfile(msg.payload);
@@ -126,7 +124,6 @@ module.exports = function(RED) {
             this.status(this.current_status);
             break;
             
-          case "setHysteresisPlus":
           case "sethysteresisplus":
             result = setHysteresisPlus(msg.payload);
             if (result.isValid) {
@@ -135,7 +132,6 @@ module.exports = function(RED) {
             this.status(result.status);
             break;
             
-          case "setHysteresisMinus":
           case "sethysteresisminus":
             result = setHysteresisMinus(msg.payload);
             if (result.isValid) {
@@ -143,8 +139,17 @@ module.exports = function(RED) {
             }
             this.status(result.status);
             break;
+
+          case "setbehavior":
+            if(msg.payload == "1" | msg.payload.toLowerCase() == "ramp"){
+              this.isRampUsed = true;
+            }else if(msg.payload == "0" | msg.payload.toLowerCase() == "step"){
+              this.isRampUsed = false;
+            }else{
+              this.warn('Unable to recognize behavior. Use "ramp" or "step"');
+            }
+            break;
          
-          case "checkUpdate":
           case "checkupdate":
             var version = readNodeVersion();
             var pck_name = "node-red-contrib-ramp-thermostat";
