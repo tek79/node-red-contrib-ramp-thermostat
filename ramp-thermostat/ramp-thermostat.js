@@ -365,6 +365,25 @@ module.exports = function(RED) {
     return {"hysteresis_minus":hm, "status":status, "isValid":valid};
   }
     
+    function setBehavior(bt) {
+    var valid;
+    var status = {};
+
+    if (typeof bt === "string") {
+      bt = parseFloat(bt);
+    }
+    
+    if (typeof bt === "number") {
+      status = {fill:"green",shape:"dot",text:"behavior set to "+bt};
+      valid = true;
+    } else {
+      valid = false;
+      status = {fill:"red",shape:"dot",text:"invalid type of behavior"};
+    }
+        
+    return {"behavior":bt, "status":status, "isValid":valid};
+  }
+  
   function getPoints(n) {
     var timei, tempi, arr, minutes;
     var points = {};
