@@ -141,6 +141,7 @@ module.exports = function(RED) {
             break;
 
           case "setbehavior":
+            result = setBehavior(msg.payload);
             if(msg.payload == "1" | msg.payload.toLowerCase() == "ramp"){
               this.isRampUsed = true;
             }else if(msg.payload == "0" | msg.payload.toLowerCase() == "step"){
